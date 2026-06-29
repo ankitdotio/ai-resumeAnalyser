@@ -1,0 +1,61 @@
+import { useContext } from "react";
+import { InterviewContext } from "../interview.context";
+import {
+  generateInterviewReport,
+  getAllInterviewReports,
+  getInterviewReportById,
+} from "../services/interview.api";
+
+export const useInterview = () => {
+  const context = useContext(InterviewContext);
+  if (!context) {
+    throw new Error("USE CONTEXT MUST BE USED WITHIN AN INTERVIEW PROVIDER");
+  }
+  const { loading, setLoading, report, setReport, reports, setReports } =
+    context;
+
+  const generateReport = async ({
+    jobDescription,
+    selfDescription,
+    resumefile,
+  }) => {
+    setLoading(true);
+    try {
+      const response = await generateInterviewReport({
+        jobDescription,
+        selfDescription,
+        resumefile,
+      });
+      setReport(response.interviewReport);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getReportById = async (interviewId) => {
+    setLoading(true);
+    try {
+      const response = await getInterviewReportById(interviewId);
+      setReport(response.interviewReport);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getReports = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllInterviewReports();
+      setReports(response.interviewReports);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  return { loading, setLoading, report, setReport, reports, setReports };
+};
